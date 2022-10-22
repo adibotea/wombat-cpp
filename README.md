@@ -1,5 +1,8 @@
-# wombat
+# Wombat
 Wombat crosswords compiler
+
+This is research code, provided with no guarantees of any kind.
+The latest version of the code can be found at url `https://github.com/adibotea/wombat-cpp`.
 
 # Sample run
 

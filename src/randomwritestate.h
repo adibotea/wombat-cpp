@@ -47,6 +47,8 @@ public:
      */
     bool isConnected() const;
 
+    void writeHeatmap() const;
+
 private:
     /*
      * Generate successors.

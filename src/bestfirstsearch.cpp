@@ -74,6 +74,7 @@ BestFirstSearch::~BestFirstSearch() {
         ofile << this->m_bestSolScore << endl;
         ofile.close();
     }
+    this->m_bestPartSol.getData().writeHeatmap();
 }
 
 int BestFirstSearch::runSearch() {
@@ -126,7 +127,6 @@ int BestFirstSearch::runSearch() {
            m_resourceLimit = true;
            break;
         }
-
     }
 
     if (q.empty() && this->m_nrSolutionsFound == 0)

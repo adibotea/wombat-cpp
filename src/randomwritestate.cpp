@@ -370,6 +370,36 @@ bool RandomWriteState::hasIllegalWords() const {
     return false;
 }
 
+void RandomWriteState::writeHeatmap() const {
+    ofstream ofile(("heatmap-" + g_pm.getScoreFileName()).c_str(), ios::out);
+    int heatmap[15][15];
+    for (int col = 0; col < this->getNrCols(); col++)
+        for (int row = 0; row < this->getNrRows(); row++)
+            heatmap[col][row] = 0;
+    for (auto slot : this->m_slots) {
+        if (slot.getPattern().isInstantiated()) {
+            if (this->wordIsThematic(slot))
+                for (int idx = 0; idx < slot.getLength(); idx++) {
+                    heatmap[slot.getCellRow(idx)][slot.getCellCol(idx)]++;
+                }
+        }
+    }
+    if (ofile) {
+        for (int row = 0; row < this->getNrRows(); row++) {
+            for (int col = 0; col < this->getNrCols(); col++) {
+                if (m_grid[row][col] == '@')
+                    ofile << m_grid[row][col] << ' ';
+                else if (m_grid[row][col] == BLANK)
+                    ofile << "- ";
+                else
+                    ofile << heatmap[row][col] << ' ';
+            }
+            ofile << endl;
+        }
+        ofile.close();
+    }
+}
+
 bool RandomWriteState::cannotReachThemPoints(int score) const {
     return false;
     bool result = (this->getMaxOptScore() < score);

@@ -44,7 +44,7 @@ ParamManager::~ParamManager() {
 }
 
 void ParamManager::displayUsage() const {
-    cerr << "Usage: ./combus [-option value]+" << endl << "Options are:" << endl
+    cerr << "Usage: ./wombat [-option value]+" << endl << "Options are:" << endl
             << "-i filename --> file with input data (mandatory)" << endl
             << "-o filename --> file where solutions are stored" << endl
             << "-sf filename --> file where the score is written" << endl
@@ -100,7 +100,7 @@ void ParamManager::displayUsage() const {
             << "-dsa 0/1 --> delayed static analysis for generated states."
             << endl << "  default: " << ParamManager::DELAYED_STATIC_ANAL << endl
             << "-heur int_value --> heuristic to rank states." << endl
-            << "  13 is for the f value from A* or weighted A*" << endl
+            << "  13 is for an admissible f value (described in AIIDE 22 paper)" << endl
             << "  12 is for (score - weight*sterile_load)" << endl
             << "  default: " << ParamManager::HEUR_ORDER << endl
             << "-corner int_value --> whether to build just one corner (and which one)."
@@ -108,7 +108,7 @@ void ParamManager::displayUsage() const {
             << endl << "  default: " << ParamManager::CORNER << endl
             << "-slot_score int_value --> the style of slot scoring."
             << endl << "  default: " << ParamManager::SLOT_SCORING << endl
-            << "-mz int_value --> max zero cells."
+            << "-mz int_value --> max zero-score cells."
             << endl << "  default: " << ParamManager::MAX_ZERO_CELLS << endl
             << "-start_slot int_value --> id of the slot to start from."
             << endl << "  default: " << ParamManager::START_SLOT << endl
@@ -117,12 +117,14 @@ void ParamManager::displayUsage() const {
             << " " << ParamManager::NTW5 << " " << ParamManager::NTW6 << endl
             << "-search int_value --> search strategy."
             << endl << "  default: " << ParamManager::SERIAL_DFS << " for serial DFS" << endl
-            << "  can also use " << ParamManager::ALLSLOTS_MULTITHREAD << " for all-slot multi-threading DFS" << endl
-            << "  can also use " << ParamManager::TWO_STEP_SEARCH << " for a two-step filling of the grid" << endl
-            << "  can also use " << ParamManager::ITERATED_SEARCH << " to iterated searches with decreasing targets down from 215" << endl
-            << "-weight double_value --> weight of the heuristic for WA* and other BFS algorithms"
+            << "  " << ParamManager::ALLSLOTS_MULTITHREAD << " independent DFS searches in multi-threading, each starting from a different slot" << endl
+            << "  " << ParamManager::TWO_STEP_SEARCH << " for a two-stage approach (SoCS 21)" << endl
+            << "  " << ParamManager::ITERATED_SEARCH << " for iterated searches with decreasing targets down from 215" << endl
+            << "  " << ParamManager::SERIAL_BFS << " for Weighted A*" << endl
+            << "  " << ParamManager::SERIAL_DFBNB << " for depth-first branch and bound" << endl
+            << "-weight double_value --> weight of the heuristic for Weighted A* and other algorithms"
             << endl << "  default: " << ParamManager::HEUR_WEIGHT << endl
-            << "-exp int_value --> node expansion style: partially delayed (0) or standard (1)"
+            << "-exp int_value --> state expansion: tiered (0) or standard (1)"
             << endl << "  default: " << ParamManager::EXPANSION_STYLE
             << endl;
 }
