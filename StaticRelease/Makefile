@@ -17,7 +17,7 @@ WOMBAT_SRCS= booleanmap.cpp \
  node.cpp state.cpp util.cpp \
  deadlockdatabase.cpp globals.cpp \
  parammanager.cpp staticpuzzleinfo.cpp \
- wordpattern.cpp limiteddiscrsearch.cpp bestfirstsearch.cpp
+ wordpattern.cpp limiteddiscrsearch.cpp bestfirstsearch.cpp dfbnb.cpp
 
 WOMBAT_OBJS1= $(patsubst %.cpp, %.o, $(WOMBAT_SRCS))
 WOMBAT_OBJS= $(WOMBAT_SRCS:%.cpp=obj/%.o)
