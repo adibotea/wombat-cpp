@@ -78,9 +78,6 @@ m_lastProcessedNode(root), m_nodeThresholdForRestart(g_pm.getNodeThresholdForRes
 
 DFBnB::~DFBnB() {
     m_summaryInfo = getSummaryInfo();
-    //cerr << "Last processed node:" << endl;
-    //cerr << m_lastProcessedNode << endl;
-    //if (m_nrSolutionsFound != 0)
     cerr << m_summaryInfo << endl;
     if (false) {
         ofstream ofile(m_summaryFileName.c_str(), ios::out | ios::app);
@@ -98,6 +95,7 @@ DFBnB::~DFBnB() {
             ofile2.close();
         }
     }
+    this->m_bestPartSol.getData().writeHeatmap();
 }
 
 int DFBnB::runSearch() {

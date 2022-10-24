@@ -48,6 +48,7 @@ void ParamManager::displayUsage() const {
             << "-i filename --> file with input data (mandatory)" << endl
             << "-o filename --> file where solutions are stored" << endl
             << "-sf filename --> file where the score is written" << endl
+            << "-hf filename --> file where the score heatmap is written" << endl
             << "-t maxtime --> maximum search time in seconds (default infinity)"
             << endl
             << "-n maxnodes --> maximum number of expanded nodes (default infinity)"
@@ -142,6 +143,9 @@ bool ParamManager::readParams(int argc, char * const argv[]) {
             it += 2;
         } else if (option == "-sf") {
             m_scoreFileName = argv[it + 1];
+            it += 2;
+        } else if (option == "-hf") {
+            m_heatmapFileName = argv[it + 1];
             it += 2;
         } else if (option == "-start_slot") {
             m_startSlot = atoi(argv[it + 1]);

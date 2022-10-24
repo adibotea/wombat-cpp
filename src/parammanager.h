@@ -43,6 +43,9 @@ public:
     string getScoreFileName() const {
         return m_scoreFileName;
     }
+    string getHeatmapFileName() const {
+        return m_heatmapFileName;
+    }
     int getPropagIters() const {
         return m_progagIters;
     }
@@ -217,6 +220,7 @@ private:
     string m_inputFileName;
     string m_solFileName;
     string m_scoreFileName;
+    string m_heatmapFileName;
     double m_maxTime;
     int m_maxNodes;
     int m_maxSolutions;

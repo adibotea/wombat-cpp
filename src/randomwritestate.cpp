@@ -371,7 +371,7 @@ bool RandomWriteState::hasIllegalWords() const {
 }
 
 void RandomWriteState::writeHeatmap() const {
-    ofstream ofile(("heatmap-" + g_pm.getScoreFileName()).c_str(), ios::out);
+    ofstream ofile(g_pm.getHeatmapFileName().c_str(), ios::out);
     int heatmap[15][15];
     for (int col = 0; col < this->getNrCols(); col++)
         for (int row = 0; row < this->getNrRows(); row++)
