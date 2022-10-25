@@ -79,21 +79,10 @@ m_lastProcessedNode(root), m_nodeThresholdForRestart(g_pm.getNodeThresholdForRes
 DFBnB::~DFBnB() {
     m_summaryInfo = getSummaryInfo();
     cerr << m_summaryInfo << endl;
-    if (false) {
-        ofstream ofile(m_summaryFileName.c_str(), ios::out | ios::app);
-        if (ofile) {
-            ofile << m_summaryInfo << endl;
-            ofile.close();
-        }
-        cout << "Statistics: ";
-        this->printStats(cout);
-        cout << endl;
-        ofstream ofile2("statistics.txt", ios::out | ios::app);
-        if (ofile2) {
-            printStats(ofile2);
-            ofile2 << endl;
-            ofile2.close();
-        }
+    ofstream ofile(g_pm.getScoreFileName().c_str(), ios::out);
+    if (ofile) {
+        ofile << this->m_bestSolScore << endl;
+        ofile.close();
     }
     this->m_bestPartSol.getData().writeHeatmap();
 }
