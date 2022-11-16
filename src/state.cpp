@@ -964,6 +964,22 @@ bool State::shortStartSlot() const {
     return false;
 }
 
+
+bool State::slotEndsWithOrigBP(const WordSlot & slot) const {
+    if (slot.getDirection() == HORIZONTAL) {
+        if (slot.getCol() + slot.getLength() >= MAX_NR_COLS)
+            return false;
+        if (m_initGrid[slot.getRow()][slot.getCol() + slot.getLength()] == BLACKPOINT)
+            return true;
+    } else {
+        if (slot.getRow() + slot.getLength() >= MAX_NR_ROWS)
+            return false;
+        if (m_initGrid[slot.getRow() + slot.getLength()][slot.getCol()] == BLACKPOINT)
+            return true;
+    }
+    return false;
+}
+
 void State::analyseUninstantiatedSlots() {
     //cerr << *this << endl;
     int sid = m_idxSelSlotGen;

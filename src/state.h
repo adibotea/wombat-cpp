@@ -271,6 +271,8 @@ public:
         myfile.close();
     }
 
+    bool slotEndsWithOrigBP(const WordSlot & slot) const;
+
 protected:
 
     typedef enum {
