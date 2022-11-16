@@ -26,6 +26,7 @@ static const int MAX_NR_ROWS = 13;
 static const int MAX_NR_COLS = 13;
 static const char BLANK = ' ';
 static const char BLACKPOINT = '@';
+static const char BLACKPOINT2 = '*';
 static const int HORIZONTAL = 0;
 static const int VERTICAL = 1;
 static const int NOTHING = -1;

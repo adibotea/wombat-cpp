@@ -172,3 +172,7 @@ string tolower(string & input) {
         str[i] = (input[i] - ('Z' - 'z'));
     return str;
 }
+
+bool isBlackPoint(char c) {
+    return (c == BLACKPOINT || c == BLACKPOINT2);
+}

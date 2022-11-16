@@ -44,4 +44,6 @@ struct IDPair {
 
 std::string tolower(std::string & input);
 
+bool isBlackPoint(char c);
+
 #endif
