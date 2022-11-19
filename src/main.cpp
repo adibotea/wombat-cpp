@@ -29,6 +29,8 @@ int main(int argc, char * const argv[]) {
         exp.twoPhaseSearch4();
     } else if (g_pm.getSearch() == ParamManager::ITERATED_SEARCH) {
         exp.searchWithTargetIterations();
+    } else if (g_pm.getSearch() == ParamManager::TOP_LEFT_BPS) {
+        exp.addLeftTopBlackpoints();
     }
     cout.flush();
     return 0;

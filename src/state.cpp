@@ -41,10 +41,10 @@ State::State() : m_propagationIterations(0), m_nrBlackPoints(0),
     }
     for (int i = 0; i < State::m_nrRows; i++) {
         for (int j = 0; j < State::m_nrCols; j++) {
-            if (m_initGrid[i][j] != BLANK && m_initGrid[i][j] != BLACKPOINT) {
+            if (m_initGrid[i][j] != BLANK && !isBlackPoint(m_initGrid[i][j])) {
                 m_recentCellInstantiations.push_back(Cell(i, j));
             }
-            if (m_initGrid[i][j] == BLACKPOINT && this->m_grid[i][j] != BLACKPOINT) {
+            if (isBlackPoint(m_initGrid[i][j]) && !isBlackPoint(this->m_grid[i][j])) {
                 this->addBlackPoint(i, j);
             } else {
                 m_grid[i][j] = m_initGrid[i][j];
@@ -80,9 +80,9 @@ m_0HitSlot(false), m_adjBPs(false), m_nrBPBlocks(0) {
     }
     for (int i = 0; i < State::m_nrRows; i++) {
         for (int j = 0; j < State::m_nrCols; j++) {
-            if (m_initGrid[i][j] != BLANK && m_initGrid[i][j] != BLACKPOINT)
+            if (m_initGrid[i][j] != BLANK && !isBlackPoint(m_initGrid[i][j]))
                 m_recentCellInstantiations.push_back(Cell(i, j));
-            if (m_initGrid[i][j] == BLACKPOINT) {
+            if (isBlackPoint(m_initGrid[i][j])) {
                 this->addBlackPoint(i, j);
             } else {
                 m_grid[i][j] = m_initGrid[i][j];
@@ -145,14 +145,19 @@ void State::collectSlotsHoriz(int row) {
     assert(pattern.size() == 0);
     int col = 0, colStart = 0;
     while (col <= m_nrCols) {
-        if (col == m_nrCols || m_grid[row][col] == BLACKPOINT) {
+        if (col == m_nrCols || isBlackPoint(m_grid[row][col])) {
             if (pattern.size() > 0) {
                 assert(pattern.size() <= State::m_nrCols);
                 for (int i = 0; i < pattern.size(); i++)
-                    assert(pattern[i] != BLACKPOINT);
-                m_slots.push_back(
-                        WordSlot(row, colStart, HORIZONTAL, pattern,
-                        m_slots.size()));
+                    assert(!isBlackPoint(pattern[i]));
+                WordSlot slot = WordSlot(row, colStart, HORIZONTAL, pattern,
+                        m_slots.size());
+                if (g_pm.getCorner() == 11) {
+                    if (this->slotEndsWithOrigBP(slot))
+                        m_slots.push_back(slot);
+                } else {
+                    m_slots.push_back(slot);
+                }
             }
             pattern.clear();
             colStart = col + 1;
@@ -168,12 +173,17 @@ void State::collectSlotsVert(int col) {
     assert(pattern.size() == 0);
     int row = 0, rowStart = 0;
     while (row <= m_nrRows) {
-        if (row == m_nrRows || m_grid[row][col] == BLACKPOINT) {
+        if (row == m_nrRows || isBlackPoint(m_grid[row][col])) {
             if (pattern.size() > 0) {
                 assert(pattern.size() <= State::m_nrRows);
-                m_slots.push_back(
-                        WordSlot(rowStart, col, VERTICAL, pattern,
-                        m_slots.size()));
+                WordSlot slot = WordSlot(rowStart, col, VERTICAL, pattern,
+                        m_slots.size());
+                if (g_pm.getCorner() == 11) {
+                    if (this->slotEndsWithOrigBP(slot))
+                        m_slots.push_back(slot);
+                } else {
+                    m_slots.push_back(slot);
+                }
             }
             pattern.clear();
             rowStart = row + 1;
@@ -183,6 +193,58 @@ void State::collectSlotsVert(int col) {
         row++;
     }
 }
+
+void State::addLeftTopBlackpoints(int slot_idx) const {
+    if (slot_idx == 0)
+        State::m_conflictDetection = 0;
+    if (slot_idx >= m_slots.size()) {
+        string filename = "topleft-" + std::to_string(m_conflictDetection) + ".pzl";
+        this->writeToFilePzl(filename);
+        m_conflictDetection++;
+        // cerr << "nr generated states: " << m_conflictDetection << endl;
+    } else {
+        int ref_length = 5;
+        const WordSlot & slot = this->m_slots[slot_idx];
+        //cerr << "slot number " << slot_idx << endl;
+        bool slot_has_bp = false;
+        if (slot.getDirection() == VERTICAL) {
+            for (int r = 0; r < slot.getLength(); r++)
+                if (m_grid[r][slot.getCol()] == BLACKPOINT)
+                    slot_has_bp = true;
+        }
+        if (slot_has_bp) {
+            State state = *this;
+            state.addLeftTopBlackpoints(slot_idx + 1);
+            return;
+        }
+        if (slot.getLength() >= ref_length + 1) {
+            //cerr << "long slot" << endl;
+            for (int xx = 1; xx <= 3; xx++) {
+                State state = *this;
+                int row = slot.getRow();
+                int col = slot.getCol();
+                if (slot.getDirection() == HORIZONTAL) {
+                    col += slot.getLength() - ref_length - xx;
+                    if (col < 0)
+                        continue;
+                } else {
+                    row += slot.getLength() - ref_length - xx;
+                    if (row < 0)
+                        continue;
+                }
+                if (state.isBPLegal(row, col)) {
+                    state.addBlackPoint(row, col);
+                    state.addLeftTopBlackpoints(slot_idx + 1);
+                }
+            }
+        } else {
+            //cerr << "short slot" << endl;
+            State state = *this;
+            state.addLeftTopBlackpoints(slot_idx + 1);
+        }
+    }
+}
+
 
 // This method is used when a deadlock is detected.
 // Starting from the slot with 0 successors,
@@ -511,10 +573,10 @@ void State::makeHorizMove(int row, int col, string word) {
             this->m_nrFilledCells++;
         }
     }
-    if (col + word.length() < m_nrCols && m_grid[row][col + word.length()] != BLACKPOINT) {
+    if (col + word.length() < m_nrCols && !isBlackPoint(m_grid[row][col + word.length()])) {
         this->addBlackPoint(row, col + word.length());
     }
-    if (col - 1 >= 0 && m_grid[row][col - 1] != BLACKPOINT) {
+    if (col - 1 >= 0 && !isBlackPoint(m_grid[row][col - 1])) {
         this->addBlackPoint(row, col - 1);
     }
 }
@@ -603,10 +665,10 @@ void State::makeVertMove(int row, int col, string word) {
             this->m_nrFilledCells++;
         }
     }
-    if (row + word.length() < m_nrRows && m_grid[row + word.length()][col] != BLACKPOINT) {
+    if (row + word.length() < m_nrRows && !isBlackPoint(m_grid[row + word.length()][col])) {
         this->addBlackPoint(row + word.length(), col);
     }
-    if (row - 1 >= 0 && m_grid[row - 1][col] != BLACKPOINT) {
+    if (row - 1 >= 0 && !isBlackPoint(m_grid[row - 1][col])) {
         this->addBlackPoint(row - 1, col);
     }
 }
@@ -753,13 +815,13 @@ void State::updateSlotsFromGrid() {
 bool State::isBPLegal(int row, int col) const {
     if (this->m_grid[row][col] != BLANK)
         return false;
-    if (row > 0 && this->m_grid[row - 1][col] == BLACKPOINT)
+    if (row > 0 && isBlackPoint(this->m_grid[row - 1][col]))
         return false;
-    if (row < this->m_nrRows && this->m_grid[row + 1][col] == BLACKPOINT)
+    if (row < this->m_nrRows && isBlackPoint(this->m_grid[row + 1][col]))
         return false;
-    if (col > 0 && this->m_grid[row][col - 1] == BLACKPOINT)
+    if (col > 0 && isBlackPoint(this->m_grid[row][col - 1]))
         return false;
-    if (col < this->m_nrCols && this->m_grid[row][col + 1] == BLACKPOINT)
+    if (col < this->m_nrCols && isBlackPoint(this->m_grid[row][col + 1]))
         return false;
     return true;
 }
@@ -964,17 +1026,58 @@ bool State::shortStartSlot() const {
     return false;
 }
 
+void State::addBlackPoint(int row, int col) {
+    assert(0 <= row && row < m_nrRows && 0 <= col && col < m_nrCols);
+    assert (!isBlackPoint(m_grid[row][col]));
+    m_grid[row][col] = BLACKPOINT;
+    m_recentBlackPointRow = row;
+    m_recentBlackPointCol = col;
+    this->m_nrBlackPoints++;
+    this->m_nrFilledCells++;
+    if (this->adjacentBlackPoints(row, col))
+        this->m_adjBPs = true;
+    m_recentCellInstantiations.push_back(Cell(row, col));
+}
+
+void State::addBlackPoint2(int row, int col) {
+    assert(0 <= row && row < m_nrRows && 0 <= col && col < m_nrCols);
+    assert (!isBlackPoint(m_grid[row][col]));
+    m_grid[row][col] = BLACKPOINT2;
+    m_recentBlackPointRow = row;
+    m_recentBlackPointCol = col;
+    this->m_nrBlackPoints++;
+    this->m_nrFilledCells++;
+    if (this->adjacentBlackPoints(row, col))
+        this->m_adjBPs = true;
+    m_recentCellInstantiations.push_back(Cell(row, col));
+}
+
+bool State::adjacentBlackPoints(int row, int col) const {
+    assert (row >= 0 && col >= 0);
+    bool common_edge = false;
+    if (row > 0 && isBlackPoint(m_grid[row - 1][col]))
+        common_edge = true;
+    if (col > 0 && isBlackPoint(m_grid[row][col - 1]))
+        common_edge = true;
+    if (row < State::m_nrRows - 1)
+        if (isBlackPoint(m_grid[row + 1][col]))
+            common_edge = true;
+    if (col < State::m_nrCols - 1)
+        if (isBlackPoint(m_grid[row][col + 1]))
+            common_edge = true;
+    return common_edge;
+};
 
 bool State::slotEndsWithOrigBP(const WordSlot & slot) const {
     if (slot.getDirection() == HORIZONTAL) {
         if (slot.getCol() + slot.getLength() >= MAX_NR_COLS)
             return false;
-        if (m_initGrid[slot.getRow()][slot.getCol() + slot.getLength()] == BLACKPOINT)
+        if (m_initGrid[slot.getRow()][slot.getCol() + slot.getLength()] == BLACKPOINT2)
             return true;
     } else {
         if (slot.getRow() + slot.getLength() >= MAX_NR_ROWS)
             return false;
-        if (m_initGrid[slot.getRow() + slot.getLength()][slot.getCol()] == BLACKPOINT)
+        if (m_initGrid[slot.getRow() + slot.getLength()][slot.getCol()] == BLACKPOINT2)
             return true;
     }
     return false;
@@ -1157,3 +1260,5 @@ char State::m_initGrid[MAX_NR_ROWS][MAX_NR_COLS];
 //unsigned int State::m_conflictDetection;
 int State::m_propagationOrdering;
 Statistics State::m_propIterationStats;
+unsigned int State::m_conflictDetection;
+

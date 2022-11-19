@@ -60,7 +60,7 @@ ostream & operator << (ostream &os, const State & state)
         string row = state.getRow(i);
         os << ". ";
         for (int k = 0; k < row.length(); k++) {
-            if (row[k] == '@')
+            if (isBlackPoint(row[k]))
                 os << red << (char) row[k] << reset << " ";
             else {
                 char c = (char) toupper(row[k]);

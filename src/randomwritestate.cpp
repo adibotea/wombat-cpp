@@ -319,7 +319,7 @@ bool RandomWriteState::isConnected() const {
     BooleanMap bm;
     queue<Cell> q;
     for (int col = 0; col < this->m_nrCols; col++) {
-        if (m_grid[0][col] != BLACKPOINT) {
+        if (!isBlackPoint(m_grid[0][col])) {
             q.push(Cell(0, col));
             bm.setValue(0, col, true);
             break;
@@ -342,7 +342,7 @@ bool RandomWriteState::isConnected() const {
                     continue;
                 if (col < 0 || col >= this->m_nrCols)
                     continue;
-                if (m_grid[row][col] != BLACKPOINT && !bm.getValue(row, col)) {
+                if (!isBlackPoint(m_grid[row][col]) && !bm.getValue(row, col)) {
                     q.push(Cell(row, col));
                     bm.setValue(row, col, true);
                 }
@@ -387,7 +387,7 @@ void RandomWriteState::writeHeatmap() const {
     if (ofile) {
         for (int row = 0; row < this->getNrRows(); row++) {
             for (int col = 0; col < this->getNrCols(); col++) {
-                if (m_grid[row][col] == '@')
+                if (isBlackPoint(m_grid[row][col]))
                     ofile << m_grid[row][col] << ' ';
                 else if (m_grid[row][col] == BLANK)
                     ofile << "- ";

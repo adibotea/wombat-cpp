@@ -106,6 +106,7 @@ void ParamManager::displayUsage() const {
             << "  default: " << ParamManager::HEUR_ORDER << endl
             << "-corner int_value --> whether to build just one corner (and which one)."
             << endl << "  0 = no corner ; 1 = top left ; and so on clockwise"
+            << endl << "  11 = instantiate only slots ending in *"
             << endl << "  default: " << ParamManager::CORNER << endl
             << "-slot_score int_value --> the style of slot scoring."
             << endl << "  default: " << ParamManager::SLOT_SCORING << endl

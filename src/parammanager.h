@@ -216,6 +216,7 @@ public:
     static const int TWO_STEP_SEARCH = 2;
     static const int TWO_STEP_SEARCH4 = 4;
     static const int ITERATED_SEARCH = 3;
+    static const int TOP_LEFT_BPS = 7;
 private:
     string m_inputFileName;
     string m_solFileName;

@@ -52,6 +52,9 @@ public:
     void evalPayloadPruning();
     void evalDicSearch();
     void runWithDetailedLog();
+
+    void addLeftTopBlackpoints() const;
+
 private:
     void makeRndThemMoves(RandomWriteState & state, int nr_moves);
 };

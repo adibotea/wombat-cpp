@@ -42,18 +42,8 @@ public:
     	return this->m_nrNTW[idx];
     }
     void makeMove(int row, int col, bool direction, string word);
-    void addBlackPoint(int row, int col) {
-        assert(0 <= row && row < m_nrRows && 0 <= col && col < m_nrCols);
-        assert (m_grid[row][col] != BLACKPOINT);
-        m_grid[row][col] = BLACKPOINT;
-        m_recentBlackPointRow = row;
-        m_recentBlackPointCol = col;
-        this->m_nrBlackPoints++;
-        this->m_nrFilledCells++;
-        if (this->adjacentBlackPoints(row, col))
-            this->m_adjBPs = true;
-        m_recentCellInstantiations.push_back(Cell(row, col));
-    }
+    void addBlackPoint(int row, int col);
+    void addBlackPoint2(int row, int col);
     bool isGoal() const {
         return this->m_goal;
     }
@@ -83,6 +73,8 @@ public:
     }
 
     bool backjumpHere(const State & deadlockState) const;
+
+    void addLeftTopBlackpoints(int slot_idx) const;
 
     /*
      * Preserve the existing slots, except for those
@@ -271,6 +263,22 @@ public:
         myfile.close();
     }
 
+    void writeToFilePzl(std::string filename) const {
+        ofstream myfile;
+        myfile.open (filename);
+        myfile << 13 << endl << 13 << endl << 1 << endl << 0 << endl << 0 << endl;
+        for (int row = 0; row < this->getNrRows(); row++) {
+            string s = this->getRow(row);
+            for (auto c : s) {
+                myfile << c << ' ';
+            }
+            myfile << endl;
+        }
+        myfile << 2 << endl << 1 << endl << "them-dic-21.txt" << endl;
+        myfile << 1 << endl << 1 << endl << 0 << endl;
+        myfile << "dictionary.txt" << endl << 1 << endl << 1 << endl;
+    }
+
     bool slotEndsWithOrigBP(const WordSlot & slot) const;
 
 protected:
@@ -398,21 +406,7 @@ protected:
             return false;
         return this->m_adjBPs;
     };
-    bool adjacentBlackPoints(int row, int col) const {
-        assert (row >= 0 && col >= 0);
-        bool common_edge = false;
-        if (row > 0 && m_grid[row - 1][col] == BLACKPOINT)
-            common_edge = true;
-        if (col > 0 && m_grid[row][col - 1] == BLACKPOINT)
-            common_edge = true;
-        if (row < State::m_nrRows - 1)
-            if (m_grid[row + 1][col] == BLACKPOINT)
-                common_edge = true;
-        if (col < State::m_nrCols - 1)
-            if (m_grid[row][col + 1] == BLACKPOINT)
-                common_edge = true;
-        return common_edge;
-    };
+    bool adjacentBlackPoints(int row, int col) const;
     void collectSlotStatistics();
     void collectSlotsHoriz(int row);
     void collectSlotsVert(int col);

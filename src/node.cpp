@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iterator>
 #include <list>
+#include "util.h"
 
 Node::Node()
 :m_depth(0), m_whichChild(0),
@@ -92,7 +93,7 @@ void Node::writeAsRbs(ostream &os) const
     for (int i = 0; i < state.getNrRows(); i++) {
         string row = state.getRow(i);
         for (int j = 0; j < row.length(); j++)
-            if (row[j] != '@')
+            if (!isBlackPoint(row[j]))
                 os << row[j];
             else
                 os << '.';

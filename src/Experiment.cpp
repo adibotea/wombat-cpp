@@ -335,6 +335,7 @@ int Experiment::runBFS()
     g_pm.setSlotScoring(5);
     g_pm.setPruneWithBPs(false);
     RandomWriteState state(1, g_pm.getStartSlot());
+
     Node root(state, 0, 0);
     BestFirstSearch search(root, "summary.txt");
     search.runSearch();
@@ -486,3 +487,13 @@ void Experiment::runWithDetailedLog()
                true); //g_pm.getPruneWithBPs()); // use pruning with admissible estimates of future BPs
     search.runSearch();
 }
+
+void Experiment::addLeftTopBlackpoints() const {
+    cerr << "Generating initial grids by adding blackpoints to the top-left of the original wall" << endl;
+    State::readStaticInfo(g_pm.getInputFileName());
+    DeadlockRecord::setStaticInfo(State::getNrRows(), State::getNrCols());
+    RandomWriteState state(1, g_pm.getStartSlot());
+    state.collectSlots();
+    state.addLeftTopBlackpoints(0);
+}
+
