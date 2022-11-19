@@ -32,3 +32,10 @@
 *.app
 Release/wombat
 StaticRelease/wombat
+Debug/wombat
+Debug/*.txt
+Debug/*.pzl
+Release/*.txt
+Release/*.pzl
+StaticRelease/*.txt
+StaticRelease/*.pzl
