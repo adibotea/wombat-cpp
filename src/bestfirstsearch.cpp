@@ -75,6 +75,9 @@ BestFirstSearch::~BestFirstSearch() {
         ofile.close();
     }
     this->m_bestPartSol.getData().writeHeatmap();
+    if (m_solFileName.length() > 0) {
+        this->m_bestPartSol.getData().writeToFilePzl(m_solFileName);
+    }
 }
 
 int BestFirstSearch::runSearch() {
@@ -185,6 +188,16 @@ void BestFirstSearch::processNode(const Node & node) {
                 sprintf(rbsFileName, "%s-%d.prb", m_solFileName.c_str(), m_nrSolutionsFound);
                 ofstream ofile(rbsFileName, ios::out);
                 node.writeAsRbs(ofile);
+                ofile.close();
+            }
+        }
+        if ((m_solFileName.length() > 0)) {
+            ofstream ofile(m_solFileName.c_str(), ios::out | ios::app);
+            if (ofile) {
+                for (int row = 0; row < node.getData().getNrRows(); row++) {
+                    ofile << node.getData().getRow(row) << endl;
+                }
+                ofile << endl;
                 ofile.close();
             }
         }
