@@ -74,10 +74,6 @@ BestFirstSearch::~BestFirstSearch() {
         ofile << this->m_bestSolScore << endl;
         ofile.close();
     }
-    this->m_bestPartSol.getData().writeHeatmap();
-    if (m_solFileName.length() > 0) {
-        this->m_bestPartSol.getData().writeToFilePzl(m_solFileName);
-    }
 }
 
 int BestFirstSearch::runSearch() {

@@ -263,6 +263,14 @@ public:
         myfile.close();
     }
 
+    void writeToFile2(ofstream & ofile) const {
+        for (int row = 0; row < this->getNrRows(); row++) {
+            string s = this->getRow(row);
+            ofile << s << endl;
+        }
+        ofile << endl;
+    }
+
     void writeToFilePzl(std::string filename) const {
         ofstream myfile;
         myfile.open (filename);

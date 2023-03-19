@@ -423,7 +423,7 @@ bool RandomWriteState::isLegal() const {
         result = false;
         reason = "illegal word";
     }
-    if ((!g_pm.getSymmetryInfo() && wordRepetition())) {
+    if (false && (!g_pm.getSymmetryInfo() && wordRepetition())) {
         reason = "word repetition";
         result = false;
     }

@@ -82,10 +82,6 @@ DepthFirstSearch::~DepthFirstSearch() {
         ofile << this->m_bestSolScore << endl;
         ofile.close();
     }
-    this->m_bestPartSol.getData().writeHeatmap();
-    if (m_solFileName.length() > 0) {
-        this->m_bestPartSol.getData().writeToFilePzl(m_solFileName);
-    }
 }
 
 int DepthFirstSearch::runSearch() {
@@ -274,34 +270,14 @@ void DepthFirstSearch::processNode(const Node & node) {
             " Exp nodes: " << m_expandedNodes <<
             " Visited nodes: " << m_visitedNodes << endl << node;
         cerr << msg.str();
-        /*
-        vector<string> pi = node.processPathInfo();
-        for (int i = 0; i < pi.size(); i++)
-            cerr << pi[i] << " ";
-        cerr << endl;
-        cerr << "Moves: " << endl;
-        for (unsigned int i = 0; i < node.getData().getMoves().size(); i++)
-            cerr << node.getData().getMoves()[i] << " ";
-        cerr << endl;
-        */
-
     }
     if (node.isGoal()) {
         if (g_pm.getVerbosity() > 0)
             cerr << node << endl;
-        if ((false && m_solFileName.length() > 0)) {
+        if (m_solFileName.length() > 0) {
             ofstream ofile(m_solFileName.c_str(), ios::out | ios::app);
-            if (ofile) {
-                ofile << "Nodes: " << m_expandedNodes << endl;
-                ofile << "Time since beginning (sec): "
-                        << getElapsedTime() << endl << node << endl;
-                ofile.close();
-                char rbsFileName[200];
-                sprintf(rbsFileName, "%s-%d.prb", m_solFileName.c_str(), m_nrSolutionsFound);
-                ofstream ofile(rbsFileName, ios::out);
-                node.writeAsRbs(ofile);
-                ofile.close();
-            }
+            node.getData().writeToFile2(ofile);
+            ofile.close();            
         }
         if (m_verbosity >= 2) {
             cerr << "Complete solution found with depth-first search ";
